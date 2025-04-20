@@ -1,38 +1,69 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define MAX_SIZE 10
-
 int main() {
-    int n;
+    int m, n;
 
-    printf("Введіть розмір квадратної матриці (N <= %d): ", MAX_SIZE);
+    printf("Введіть кількість рядків (M): ");
+    scanf("%d", &m);
+
+    printf("Введіть кількість стовпців (N): ");
     scanf("%d", &n);
 
-    if (n <= 0 || n > MAX_SIZE) {
-        printf("Некоректний розмір матриці.\n");
+    int **x = (int **)malloc(m * sizeof(int *));
+    if (x == NULL) {
+        printf("Помилка виділення пам'яті для рядків матриці.\n");
+        return 1;
+    }
+    for (int i = 0; i < m; i++) {
+        x[i] = (int *)malloc(n * sizeof(int));
+        if (x[i] == NULL) {
+            printf("Помилка виділення пам'яті для елементів рядка %d.\n", i);
+            for (int j = 0; j < i; j++) {
+                free(x[j]);
+            }
+            free(x);
+            return 1;
+        }
+    }
+
+    printf("Введіть елементи матриці X[%d x %d]:\n", m, n);
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
+            printf("X[%d][%d] = ", i, j);
+            scanf("%d", &x[i][j]);
+        }
+    }
+
+    int *y = (int *)malloc(m * sizeof(int));
+    if (y == NULL) {
+        printf("Помилка виділення пам'яті для масиву Y.\n");
+        for (int i = 0; i < m; i++) {
+            free(x[i]);
+        }
+        free(x);
         return 1;
     }
 
-    double a[MAX_SIZE][MAX_SIZE];
-
-    printf("Введіть елементи матриці:\n");
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < m; i++) {
+        y[i] = 0;
         for (int j = 0; j < n; j++) {
-            printf("A[%d][%d] = ", i, j);
-            scanf("%lf", &a[i][j]);
-        }
-    }
-
-    for (int j = 0; j < n; j++) {
-        double sum_even = 0;
-        for (int i = 0; i < n; i++) {
-            if (((int)a[i][j]) % 2 == 0) { 
-                sum_even += a[i][j];
+            if (j > i) {
+                y[i] += x[i][j];
             }
         }
-        printf("Сума парних елементів у стовпці %d: %.2lf\n", j + 1, sum_even);
     }
+
+    printf("\nМасив Y (суми елементів нижче головної діагоналі для кожного рядка):\n");
+    for (int i = 0; i < m; i++) {
+        printf("Y[%d] = %d\n", i, y[i]);
+    }
+
+    for (int i = 0; i < m; i++) {
+        free(x[i]);
+    }
+    free(x);
+    free(y);
 
     return 0;
 }
