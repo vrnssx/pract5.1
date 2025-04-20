@@ -1,37 +1,55 @@
 #include <stdio.h>
-#include <stdlib.h>
+#include <math.h>
 
-#define MAX_SIZE 10
+#define SIZE 10
 
 int main() {
-    int n;
+    double array[SIZE];
+    double sum = 0.0, average;
+    int i, closest_index;
+    double min_diff;
+    int first_negative_index = -1, second_positive_index = -1;
+    double sum_between = 0.0;
 
-    printf("Введіть розмір квадратної матриці (N <= %d): ", MAX_SIZE);
-    scanf("%d", &n);
-
-    if (n <= 0 || n > MAX_SIZE) {
-        printf("Некоректний розмір матриці.\n");
-        return 1;
+    printf("Введіть %d дійсних чисел:\n", SIZE);
+    for (i = 0; i < SIZE; i++) {
+        scanf("%lf", &array[i]);
+        sum += array[i];
     }
 
-    double a[MAX_SIZE][MAX_SIZE];
+    average = sum / SIZE;
 
-    printf("Введіть елементи матриці:\n");
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            printf("A[%d][%d] = ", i, j);
-            scanf("%lf", &a[i][j]);
+    closest_index = 0;
+    min_diff = fabs(array[0] - average);
+    for (i = 1; i < SIZE; i++) {
+        double diff = fabs(array[i] - average);
+        if (diff < min_diff) {
+            min_diff = diff;
+            closest_index = i;
         }
     }
 
-    for (int j = 0; j < n; j++) {
-        double sum_even = 0;
-        for (int i = 0; i < n; i++) {
-            if (((int)a[i][j]) % 2 == 0) { 
-                sum_even += a[i][j];
-            }
+    for (i = 0; i < SIZE; i++) {
+        if (array[i] < 0 && first_negative_index == -1) {
+            first_negative_index = i;
         }
-        printf("Сума парних елементів у стовпці %d: %.2lf\n", j + 1, sum_even);
+        if (array[i] > 0 && first_negative_index != -1 && second_positive_index == -1 && i > first_negative_index) {
+            second_positive_index = i;
+            break;
+        }
+    }
+
+    if (first_negative_index != -1 && second_positive_index != -1 && second_positive_index > first_negative_index) {
+        for (i = first_negative_index + 1; i < second_positive_index; i++) {
+            sum_between += array[i];
+        }
+    }
+
+    printf("Номер елемента, найближчого до середнього арифметичного: %d\n", closest_index);
+    if (first_negative_index != -1 && second_positive_index != -1 && second_positive_index > first_negative_index) {
+        printf("Сума елементів між першим від'ємним та другим додатним: %.2lf\n", sum_between);
+    } else {
+        printf("Не вдалося знайти перший від'ємний та другий додатний елементи, або вони розташовані неправильно.\n");
     }
 
     return 0;
